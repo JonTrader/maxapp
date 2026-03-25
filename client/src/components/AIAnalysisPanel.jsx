@@ -8,6 +8,7 @@ export default function AIAnalysisPanel({ analysis }) {
   const missingKeywords = analysis?.missingKeywords ?? []
   const resumeSuggestions = analysis?.resumeSuggestions ?? []
   const coverLetterDraft = analysis?.coverLetterDraft ?? ''
+  const verdict = analysis?.verdict ?? ''
 
   const showEmpty = !analysis || Object.keys(analysis).length === 0
 
@@ -103,6 +104,11 @@ export default function AIAnalysisPanel({ analysis }) {
           value={coverLetterDraft}
           readOnly
         />
+      </div>
+
+      <div className='mt-10'>
+        <h4 className="text-sm font-semibold">Verdict:</h4>
+        <div className='mt-2 italic underline'>{verdict}</div>
       </div>
     </div>
   )

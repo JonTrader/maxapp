@@ -23,10 +23,10 @@ export default function Header({ title }) {
         </Link>
 
         <div className="flex items-center gap-4">
-          {title && <h1 className="text-sm font-semibold text-base-content/70">{title}</h1>}
+          {title && <h1 className="text-xl font-semibold text-white">{title}</h1>}
           <button
             type="button"
-            className="btn btn-ghost btn-sm gap-2"
+            className="btn btn-ghost btn-sm gap-2 hover:border-white"
             onClick={handleLogout}
           >
             <LogOut className="h-4 w-4" />

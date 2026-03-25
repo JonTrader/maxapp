@@ -25,6 +25,14 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/applications', applicationRoutes);
 app.use('/api/v1/ai', aiRoutes);
 
+if (process.env.NODE_ENV === 'production') {
+  app.use(express.static(path.join(__dirname, '../client/dist')))
+
+  app.get('/*splat', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'))
+  })
+}
+
 // global error handler (simple)
 app.use((err, req, res, next) => {
   console.error(err);

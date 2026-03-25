@@ -66,15 +66,3 @@ export const login = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
-
-export const logout = async (req, res) => {
-  // With JWT, logout is primarily client-side (delete token from storage)
-  // This endpoint validates the token is still valid and returns success
-  // The client then removes the token from localStorage/sessionStorage
-  try {
-    res.json({ message: 'Logged out successfully' });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
-  }
-};

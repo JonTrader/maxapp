@@ -1,8 +1,10 @@
 import express from 'express';
 import multer from 'multer';
 import auth from '../middleware/auth.js';
+import { limiter } from '../lib/rateLimit.js';
 import {
   getAll,
+  getApplication,
   create,
   update,
   remove
@@ -23,9 +25,10 @@ const upload = multer({
   }
 });
 
-router.use(auth);
+router.use(auth, limiter);
 
 router.get('/', getAll);
+router.get('/:id', getApplication);
 router.post('/', upload.single('resume'), create);
 router.put('/:id', update);
 router.delete('/:id', remove);

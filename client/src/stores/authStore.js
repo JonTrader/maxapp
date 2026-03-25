@@ -6,18 +6,20 @@ const useAuthStore = create(
     (set) => ({
       token: null,
       isAuthenticated: false,
+
       setToken: (token) => set({ token, isAuthenticated: !!token }),
+
       login: (token) => {
         set({ token, isAuthenticated: true })
       },
+
       logout: () => {
         set({ token: null, isAuthenticated: false })
       }
-    }),
-    {
-      name: 'maxapp-auth',
-      getStorage: () => localStorage
-    }
+    }), {
+    name: 'maxapp-auth',
+    getStorage: () => localStorage
+  }
   )
 )
 

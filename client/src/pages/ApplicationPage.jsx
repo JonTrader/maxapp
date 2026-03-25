@@ -19,18 +19,16 @@ export default function ApplicationPage() {
   const fetchApplication = async () => {
     setLoading(true)
     try {
-      const { data } = await api.get('/applications')
-      const found = data.find((app) => app._id === id)
-      if (!found) {
+      const res = await api.get(`/applications/${id}`)
+      if (!res.data) {
         toast.error('Application not found')
         navigate('/dashboard')
         return
       }
-      console.log(found)
-      setApplication(found)
+      setApplication(res.data)
     } catch (err) {
       console.error(err)
-      toast.error('Unable to load application')
+      toast.error(err.response?.data?.message || 'Unable to load application')
     } finally {
       setLoading(false)
     }
@@ -39,7 +37,7 @@ export default function ApplicationPage() {
   useEffect(() => {
     fetchApplication()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id])
+  }, [])
 
   const appliedDate = useMemo(() => {
     if (!application?.appliedDate) return null
@@ -62,7 +60,7 @@ export default function ApplicationPage() {
       toast.success('Status updated')
     } catch (err) {
       console.error(err)
-      toast.error('Failed to update status')
+      toast.error(err.response?.data?.message || 'Failed to update status')
     } finally {
       setSaving(false)
     }
@@ -114,7 +112,7 @@ export default function ApplicationPage() {
           <div className="space-y-2">
             <button
               type="button"
-              className="btn btn-ghost gap-2"
+              className="btn gap-2 btn-ghost bg-blue-500"
               onClick={() => navigate('/dashboard')}
             >
               <ChevronLeft className="h-4 w-4" />
@@ -135,7 +133,7 @@ export default function ApplicationPage() {
 
           {application.jobUrl && (
             <a
-              href={application.jobUrl}
+              href={`https://${application.jobUrl}`}
               target="_blank"
               rel="noreferrer"
               className="btn btn-outline btn-sm gap-2"
@@ -165,6 +163,13 @@ export default function ApplicationPage() {
               {saving ? 'Saving...' : 'Status updates are saved automatically.'}
             </span>
           </div>
+        </section>
+
+        <section className="mt-6 rounded-xl border border-base-200 bg-base-100 p-6">
+          <h2 className="text-lg font-semibold">Notes</h2>
+          <p className="mt-3 whitespace-pre-wrap text-sm text-base-content/80">
+            {application.notes || 'No notes are available'}
+          </p>
         </section>
 
         <section className="mt-6 rounded-xl border border-base-200 bg-base-100 p-6">

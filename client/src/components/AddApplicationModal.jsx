@@ -11,6 +11,7 @@ const defaultState = {
   location: '',
   notes: '',
   jobDescription: '',
+  jobUrl: '',
   resume: undefined,
   runAnalysis: false
 }
@@ -63,6 +64,7 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
       formData.append('notes', form.notes)
       formData.append('location', form.location)
       formData.append('jobDescription', form.jobDescription)
+      formData.append('jobUrl', form.jobUrl)
       formData.append('resume', form.resume)
 
       const { data: created } = await api.post('/applications', formData)
@@ -114,7 +116,7 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
         <form className="mt-4 space-y-4" onSubmit={handleSubmit}>
           <div className="grid gap-4 md:grid-cols-2">
             <label className="input-group">
-              <span className="w-32">Company</span>
+              <span className="w-32">Company *</span>
               <input
                 value={form.company}
                 onChange={handleChange('company')}
@@ -125,7 +127,7 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
               />
             </label>
             <label className="input-group">
-              <span className="w-32">Role</span>
+              <span className="w-32">Role *</span>
               <input
                 value={form.role}
                 onChange={handleChange('role')}
@@ -174,20 +176,22 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
             />
           </label>
 
-          <label className="input-group">
-            <span className="w-32">Notes</span>
-            <textarea
-              value={form.notes}
-              onChange={handleChange('notes')}
-              className="textarea textarea-bordered w-full"
-              placeholder="Optional notes about this role"
-              rows={3}
-            />
-          </label>
-
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className='mt-4'>
             <label className="input-group">
-              <span className="w-32">Job description</span>
+              <span className="w-32">Notes</span>
+              <textarea
+                value={form.notes}
+                onChange={handleChange('notes')}
+                className="textarea textarea-bordered w-full"
+                placeholder="Optional notes about this role"
+                rows={3}
+              />
+            </label>
+          </div>
+
+          <div className="mt-4 grid gap-4 md:grid-cols-2 grid-flow-col">
+            <label className="row-span-3 input-group">
+              <span className="w-32">Job description *</span>
               <textarea
                 value={form.jobDescription}
                 onChange={handleChange('jobDescription')}
@@ -196,9 +200,20 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
                 rows={4}
               />
             </label>
+            <label className="input-group">
+              <span className="w-32">Job Application URL</span>
+              <input
+                value={form.jobUrl}
+                onChange={handleChange('jobUrl')}
+                type="text"
+                placeholder="https://joburl.com"
+                className="input input-bordered w-full"
+                required
+              />
+            </label>
             <label className="form-control w-full">
               <div className="label">
-                <span className="label-text text-sm">Resume (PDF)</span>
+                <span className="label-text text-sm">Resume (PDF) *</span>
               </div>
               <input
                 type="file"

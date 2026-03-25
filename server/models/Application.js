@@ -5,6 +5,7 @@ const applicationSchema = new mongoose.Schema({
   company: { type: String, required: true },
   role: { type: String, required: true },
   jobDescription: { type: String },
+  jobUrl: { type: String },
   status: {
     type: String,
     enum: ['Saved', 'Applied', 'Interview', 'Offer', 'Rejected'],
