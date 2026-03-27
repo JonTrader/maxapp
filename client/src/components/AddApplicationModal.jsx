@@ -24,7 +24,16 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
 
   useEffect(() => {
     if (open) {
-      setForm(defaultState)
+      const today = new Date()
+      const year = today.getFullYear()
+      const month = String(today.getMonth() + 1).padStart(2, '0')
+      const day = String(today.getDate()).padStart(2, '0')
+      const todayDate = `${year}-${month}-${day}`
+
+      setForm({
+        ...defaultState,
+        appliedDate: todayDate
+      })
       setSaving(false)
     }
   }, [open])
@@ -47,6 +56,12 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
     setForm((prev) => ({ ...prev, runAnalysis: !prev.runAnalysis }))
   }
 
+  const cleanUrl = (url) => {
+    if (!url) return ''
+    // Remove protocol if present (http://, https://)
+    return url.replace(/^(https?:\/\/)/, '').trim()
+  }
+
   const handleSubmit = async (event) => {
     event.preventDefault()
     if (!canSubmit) return
@@ -64,7 +79,7 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
       formData.append('notes', form.notes)
       formData.append('location', form.location)
       formData.append('jobDescription', form.jobDescription)
-      formData.append('jobUrl', form.jobUrl)
+      formData.append('jobUrl', cleanUrl(form.jobUrl))
       formData.append('resume', form.resume)
 
       const { data: created } = await api.post('/applications', formData)
@@ -206,7 +221,7 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
                 value={form.jobUrl}
                 onChange={handleChange('jobUrl')}
                 type="text"
-                placeholder="https://joburl.com"
+                placeholder="https://joburl.com/job"
                 className="input input-bordered w-full"
                 required
               />

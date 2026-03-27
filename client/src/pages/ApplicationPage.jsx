@@ -133,7 +133,7 @@ export default function ApplicationPage() {
 
           {application.jobUrl && (
             <a
-              href={`https://${application.jobUrl}`}
+              href={application.jobUrl.startsWith('http') ? application.jobUrl : `https://${application.jobUrl}`}
               target="_blank"
               rel="noreferrer"
               className="btn btn-outline btn-sm gap-2"
