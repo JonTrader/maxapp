@@ -91,7 +91,7 @@ export default function StatusPage() {
 
     return (
         <div className="min-h-screen bg-base-200">
-            <Header title={canonicalStatus || 'Status'} />
+            <Header />
 
             <main className="mx-auto max-w-7xl px-4 py-8">
                 <div className="mb-6 flex items-center justify-between">
