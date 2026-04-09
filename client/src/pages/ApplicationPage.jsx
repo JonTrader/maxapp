@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import toast from 'react-hot-toast'
-import { ChevronLeft, ExternalLink } from 'lucide-react'
+import { ChevronLeft, ExternalLink, Trash2 } from 'lucide-react'
 import api from '../api/api'
 import Header from '../components/Header'
 import AIAnalysisPanel from '../components/AIAnalysisPanel'
@@ -14,6 +14,8 @@ export default function ApplicationPage() {
   const [application, setApplication] = useState(null)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [deleting, setDeleting] = useState(false)
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [analysisLoading, setAnalysisLoading] = useState(false)
 
   const fetchApplication = async () => {
@@ -89,6 +91,34 @@ export default function ApplicationPage() {
     }
   }
 
+  const handleDelete = async () => {
+    if (!application || deleting) return
+
+    setDeleting(true)
+
+    try {
+      await api.delete(`/applications/${application._id}`)
+      toast.success('Application deleted')
+      navigate('/dashboard')
+    } catch (err) {
+      console.error(err)
+      toast.error(err.response?.data?.message || 'Failed to delete application')
+    } finally {
+      setDeleting(false)
+      setShowDeleteModal(false)
+    }
+  }
+
+  const openDeleteModal = () => {
+    if (deleting) return
+    setShowDeleteModal(true)
+  }
+
+  const closeDeleteModal = () => {
+    if (deleting) return
+    setShowDeleteModal(false)
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-base-200">
@@ -106,19 +136,20 @@ export default function ApplicationPage() {
 
   return (
     <div className="min-h-screen bg-base-200">
-      <Header title={application.company} />
+      <Header />
       <main className="mx-auto max-w-5xl px-4 py-8">
         <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
           <div className="space-y-2">
             <button
               type="button"
-              className="btn gap-2 btn-ghost bg-blue-500"
+              className="btn gap-2 btn-primary hover:border-white"
               onClick={() => navigate('/dashboard')}
             >
               <ChevronLeft className="h-4 w-4" />
               Back to Dashboard
             </button>
-            <div>
+            <div className='mt-6'>
+              <h1 className='text-xl'>{application.company}</h1>
               <p className="text-sm text-base-content/60">{application.role}</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 {application.location && (
@@ -131,17 +162,28 @@ export default function ApplicationPage() {
             </div>
           </div>
 
-          {application.jobUrl && (
-            <a
-              href={application.jobUrl.startsWith('http') ? application.jobUrl : `https://${application.jobUrl}`}
-              target="_blank"
-              rel="noreferrer"
-              className="btn btn-outline btn-sm gap-2"
+          <div className="flex flex-wrap items-center gap-2 md:justify-end">
+            {application.jobUrl && (
+              <a
+                href={application.jobUrl.startsWith('http') ? application.jobUrl : `https://${application.jobUrl}`}
+                target="_blank"
+                rel="noreferrer"
+                className="btn btn-outline btn-sm gap-2"
+              >
+                <ExternalLink className="h-4 w-4" />
+                View Job Posting
+              </a>
+            )}
+            <button
+              type="button"
+              className="btn btn-error btn-sm gap-2 hover:border-white"
+              onClick={openDeleteModal}
+              disabled={deleting}
             >
-              <ExternalLink className="h-4 w-4" />
-              View Job Posting
-            </a>
-          )}
+              <Trash2 className="h-4 w-4" />
+              {deleting ? 'Deleting...' : 'Delete Application'}
+            </button>
+          </div>
         </div>
 
         <section className="mt-6 rounded-xl border border-base-200 bg-base-100 p-6">
@@ -196,6 +238,47 @@ export default function ApplicationPage() {
           </div>
         </section>
       </main>
+
+      {showDeleteModal && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md">
+            <h2 className="text-xl font-semibold">Delete application?</h2>
+            <p className="mt-3 text-sm text-base-content/70">
+              This will permanently remove the {application.company} job application.
+            </p>
+            <p className="mt-2 text-sm text-base-content/70">
+              This action cannot be undone.
+            </p>
+            <div className="modal-action">
+              <button
+                type="button"
+                className="btn btn-ghost"
+                onClick={closeDeleteModal}
+                disabled={deleting}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="btn btn-error gap-2"
+                onClick={handleDelete}
+                disabled={deleting}
+              >
+                <Trash2 className="h-4 w-4" />
+                {deleting ? 'Deleting...' : 'Delete Application'}
+              </button>
+            </div>
+          </div>
+          <button
+            type="button"
+            className="modal-backdrop"
+            onClick={closeDeleteModal}
+            aria-label="Close delete confirmation"
+          >
+            Close
+          </button>
+        </div>
+      )}
     </div>
   )
 }
