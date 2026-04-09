@@ -19,7 +19,7 @@ export default function Header() {
           to="/dashboard"
           className="flex items-center gap-2 text-lg font-semibold"
         >
-          <span><img className='h-12' src={resume} alt="" /></span>
+          <span><img className='h-10' src={resume} alt="" /></span>
           <span>MaxApp</span>
         </Link>
 

@@ -53,8 +53,8 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-base-200">
       <Header />
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <main className="mx-auto w-full px-4 py-8">
+        <div className="flex gap-5 flex-row md:items-end justify-between lg:w-4/5 lg:mx-auto">
           <div>
             <h2 className="text-2xl font-semibold">Your Applications</h2>
             <div className="mt-2 flex flex-wrap gap-2 text-sm">
@@ -76,7 +76,7 @@ export default function DashboardPage() {
         {loading ? (
           <div className="mt-12 text-center text-base-content/70">Loading applications…</div>
         ) : (
-          <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-8 grid gap-4 sm:grid-cols-3 xl:grid-cols-5">
             {STATUS_ORDER.map((status) => {
               const bucket = statuses[status] ?? { total: 0, items: [] }
               const hasMore = bucket.total > bucket.items.length
