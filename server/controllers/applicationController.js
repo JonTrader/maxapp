@@ -1,9 +1,12 @@
 import Application from '../models/Application.js';
 import { PDFParse } from 'pdf-parse';
+import mongoose from 'mongoose';
 
 const STATUS_ORDER = ['Applied', 'Interview', 'Offer', 'Rejected', 'Saved'];
 const DEFAULT_STATUS_PAGE_LIMIT = 20;
 const MAX_STATUS_PAGE_LIMIT = 100;
+
+const isValidObjectId = (value) => mongoose.Types.ObjectId.isValid(value);
 
 const getCanonicalStatus = (value) => {
   if (typeof value !== 'string') return null;
@@ -25,7 +28,12 @@ const createStatusSummary = () => (
 
 export const getAll = async (req, res) => {
   try {
-    const apps = await Application.find({ userId: req.user._id });
+    const apps = await Application.find(
+      { userId: req.user._id },
+      { resumeSnapshot: 0 }
+    )
+      .sort({ createdAt: -1 })
+      .lean();
     res.json(apps);
   } catch (err) {
     console.error(err);
@@ -79,28 +87,26 @@ export const getByStatus = async (req, res) => {
       : Math.min(Math.max(parsedLimit, 1), MAX_STATUS_PAGE_LIMIT);
 
     const query = { userId: req.user._id, status: canonicalStatus };
-
-    const [items, total] = await Promise.all([
-      Application.find(query, { resumeSnapshot: 0 })
-        .sort({ createdAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .lean(),
-      Application.countDocuments(query)
-    ]);
-
+    const total = await Application.countDocuments(query);
     const totalPages = Math.max(1, Math.ceil(total / limit));
+    const effectivePage = Math.min(page, totalPages);
+
+    const items = await Application.find(query, { resumeSnapshot: 0 })
+      .sort({ createdAt: -1 })
+      .skip((effectivePage - 1) * limit)
+      .limit(limit)
+      .lean();
 
     res.json({
       status: canonicalStatus,
       items,
       pagination: {
-        page,
+        page: effectivePage,
         limit,
         total,
         totalPages,
-        hasNext: page < totalPages,
-        hasPrev: page > 1 && total > 0
+        hasNext: effectivePage < totalPages,
+        hasPrev: effectivePage > 1 && total > 0
       }
     });
   } catch (err) {
@@ -112,7 +118,11 @@ export const getByStatus = async (req, res) => {
 export const getApplication = async (req, res) => {
   try {
     const { id } = req.params
-    const app = await Application.findById({_id: id})
+    if (!isValidObjectId(id)) {
+      return res.status(400).json({ message: 'Invalid application id' })
+    }
+
+    const app = await Application.findOne({ _id: id, userId: req.user._id })
     if (!app) {
       return res.status(404).json({ message: 'Application was not found' })
     }
@@ -134,7 +144,11 @@ export const create = async (req, res) => {
     const app = new Application(data);
     app.resumeSnapshot = resumeText
     await app.save();
-    res.status(201).json(app);
+
+    const createdApp = app.toObject();
+    delete createdApp.resumeSnapshot;
+
+    res.status(201).json(createdApp);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: 'Server error' });
@@ -143,6 +157,10 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid application id' });
+    }
+
     const app = await Application.findOneAndUpdate(
       { _id: req.params.id, userId: req.user._id },
       req.body,
@@ -162,6 +180,10 @@ export const update = async (req, res) => {
 
 export const remove = async (req, res) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: 'Invalid application id' });
+    }
+
     const app = await Application.findOneAndDelete({
       _id: req.params.id,
       userId: req.user._id

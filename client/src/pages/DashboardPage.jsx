@@ -39,10 +39,12 @@ export default function DashboardPage() {
   const offers = statuses['Offer']?.total ?? 0
 
   const handleCreated = (app) => {
-    const status = STATUS_ORDER.includes(app.status) ? app.status : 'Saved'
+    const safeApp = { ...(app || {}) }
+    delete safeApp.resumeSnapshot
+    const status = STATUS_ORDER.includes(safeApp.status) ? safeApp.status : 'Saved'
     setStatuses((prev) => {
       const bucket = prev[status]
-      const newItems = [app, ...bucket.items].slice(0, 5)
+      const newItems = [safeApp, ...bucket.items].slice(0, 5)
       return { ...prev, [status]: { total: bucket.total + 1, items: newItems } }
     })
   }
