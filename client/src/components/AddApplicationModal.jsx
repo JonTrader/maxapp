@@ -223,7 +223,6 @@ export default function AddApplicationModal({ open, onClose, onCreated }) {
                 type="text"
                 placeholder="https://joburl.com/job"
                 className="input input-bordered w-full"
-                required
               />
             </label>
             <label className="form-control w-full">

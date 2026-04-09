@@ -6,9 +6,11 @@ import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import ApplicationPage from './pages/ApplicationPage'
 import PrivateRoute from './components/PrivateRoute'
+import { isTokenValid } from './stores/authStore'
 
 function App() {
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const token = useAuthStore((state) => state.token)
+  const isAuthenticated = isTokenValid(token)
 
   return (
     <>
