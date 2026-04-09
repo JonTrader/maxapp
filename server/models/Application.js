@@ -18,4 +18,6 @@ const applicationSchema = new mongoose.Schema({
   aiAnalysis: { type: Object, default: {} },
 }, { timestamps: true });
 
+applicationSchema.index({ userId: 1, status: 1, createdAt: -1 });
+
 export default mongoose.model('Application', applicationSchema);

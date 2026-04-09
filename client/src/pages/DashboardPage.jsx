@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
 import { Plus } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api from '../api/api'
@@ -8,16 +9,19 @@ import Header from '../components/Header'
 
 const STATUS_ORDER = ['Applied', 'Interview', 'Offer', 'Rejected', 'Saved']
 
+const createEmptyStatuses = () =>
+  STATUS_ORDER.reduce((acc, status) => ({ ...acc, [status]: { total: 0, items: [] } }), {})
+
 export default function DashboardPage() {
-  const [applications, setApplications] = useState([])
+  const [statuses, setStatuses] = useState(createEmptyStatuses())
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
 
   const fetchApplications = async () => {
     setLoading(true)
     try {
-      const { data } = await api.get('/applications')
-      setApplications(data || [])
+      const { data } = await api.get('/applications/summary/by-status')
+      setStatuses({ ...createEmptyStatuses(), ...(data?.statuses || {}) })
     } catch (err) {
       console.error(err)
       toast.error('Unable to load applications')
@@ -30,22 +34,17 @@ export default function DashboardPage() {
     fetchApplications()
   }, [])
 
-  const grouped = useMemo(() => {
-    const map = STATUS_ORDER.reduce((acc, status) => ({ ...acc, [status]: [] }), {})
-    applications.forEach((app) => {
-      const status = app.status || 'Saved'
-      if (!map[status]) map[status] = []
-      map[status].push(app)
-    })
-    return map
-  }, [applications])
-
-  const total = applications.length
-  const active = applications.filter((app) => ['Applied', 'Interview', 'Offer'].includes(app.status)).length
-  const offers = applications.filter((app) => app.status === 'Offer').length
+  const total = STATUS_ORDER.reduce((sum, s) => sum + (statuses[s]?.total ?? 0), 0)
+  const active = ['Applied', 'Interview', 'Offer'].reduce((sum, s) => sum + (statuses[s]?.total ?? 0), 0)
+  const offers = statuses['Offer']?.total ?? 0
 
   const handleCreated = (app) => {
-    setApplications((prev) => [app, ...prev])
+    const status = STATUS_ORDER.includes(app.status) ? app.status : 'Saved'
+    setStatuses((prev) => {
+      const bucket = prev[status]
+      const newItems = [app, ...bucket.items].slice(0, 5)
+      return { ...prev, [status]: { total: bucket.total + 1, items: newItems } }
+    })
   }
 
   return (
@@ -76,33 +75,45 @@ export default function DashboardPage() {
           <div className="mt-12 text-center text-base-content/70">Loading applications…</div>
         ) : (
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {STATUS_ORDER.map((status) => (
-              <section
-                key={status}
-                className="rounded-xl border border-base-200 bg-base-100 p-4"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-semibold">{status}</h3>
-                  <span className="text-xs text-base-content/60">
-                    {grouped[status]?.length ?? 0} applications
-                  </span>
-                </div>
+            {STATUS_ORDER.map((status) => {
+              const bucket = statuses[status] ?? { total: 0, items: [] }
+              const hasMore = bucket.total > bucket.items.length
+              return (
+                <section
+                  key={status}
+                  className="rounded-xl border border-base-200 bg-base-100 p-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-semibold">{status}</h3>
+                    <span className="text-xs text-base-content/60">
+                      {bucket.total} applications
+                    </span>
+                  </div>
 
-                <div className="mt-4 space-y-3">
-                  {(grouped[status] || []).map((application) => (
-                    <ApplicationCard
-                      key={application._id}
-                      application={application}
-                    />
-                  ))}
-                  {(grouped[status] || []).length === 0 && (
-                    <div className="rounded-xl border border-dashed border-base-200 bg-base-100 p-4 text-sm text-base-content/70">
-                      No applications yet.
-                    </div>
-                  )}
-                </div>
-              </section>
-            ))}
+                  <div className="mt-4 space-y-3">
+                    {bucket.items.map((application) => (
+                      <ApplicationCard
+                        key={application._id}
+                        application={application}
+                      />
+                    ))}
+                    {bucket.items.length === 0 && (
+                      <div className="rounded-xl border border-dashed border-base-200 bg-base-100 p-4 text-sm text-base-content/70">
+                        No applications yet.
+                      </div>
+                    )}
+                    {hasMore && (
+                      <Link
+                        to={`/status/${status}`}
+                        className="block text-center text-xs text-primary hover:underline"
+                      >
+                        View all {bucket.total} →
+                      </Link>
+                    )}
+                  </div>
+                </section>
+              )
+            })}
           </div>
         )}
 
