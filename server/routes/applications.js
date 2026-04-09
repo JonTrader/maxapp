@@ -4,6 +4,8 @@ import auth from '../middleware/auth.js';
 import { limiter } from '../lib/rateLimit.js';
 import {
   getAll,
+  getLatestByStatus,
+  getByStatus,
   getApplication,
   create,
   update,
@@ -28,6 +30,8 @@ const upload = multer({
 router.use(auth, limiter);
 
 router.get('/', getAll);
+router.get('/summary/by-status', getLatestByStatus);
+router.get('/status/:status', getByStatus);
 router.get('/:id', getApplication);
 router.post('/', upload.single('resume'), create);
 router.put('/:id', update);

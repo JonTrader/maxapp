@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import ApplicationPage from './pages/ApplicationPage'
+import StatusPage from './pages/StatusPage'
 import PrivateRoute from './components/PrivateRoute'
 import { isTokenValid } from './stores/authStore'
 
@@ -31,6 +32,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ApplicationPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/status/:status"
+            element={
+              <PrivateRoute>
+                <StatusPage />
               </PrivateRoute>
             }
           />
