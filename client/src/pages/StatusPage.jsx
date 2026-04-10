@@ -125,12 +125,12 @@ export default function StatusPage() {
                             {items.map((application) => (
                                 <ApplicationCard key={application._id} application={application} />
                             ))}
-                            {items.length === 0 && (
-                                <div className="rounded-xl border border-dashed border-base-200 bg-base-100 p-6 text-sm text-base-content/70">
-                                    No applications found for {canonicalStatus}.
-                                </div>
-                            )}
                         </div>
+                        {items.length === 0 && (
+                            <div className="rounded-xl border border-dashed border-base-200 bg-base-100 p-6 text-sm text-base-content/70">
+                                No applications found for {canonicalStatus}.
+                            </div>
+                        )}
 
                         <div className="mt-6 flex items-center justify-between">
                             <button

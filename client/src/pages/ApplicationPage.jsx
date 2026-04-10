@@ -99,7 +99,7 @@ export default function ApplicationPage() {
     try {
       await api.delete(`/applications/${application._id}`)
       toast.success('Application deleted')
-      navigate('/dashboard')
+      navigate(`/status/${application.status}`)
     } catch (err) {
       console.error(err)
       toast.error(err.response?.data?.message || 'Failed to delete application')
