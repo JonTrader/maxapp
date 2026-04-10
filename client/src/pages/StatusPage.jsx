@@ -4,6 +4,7 @@ import toast from 'react-hot-toast'
 import api from '../api/api'
 import ApplicationCard from '../components/ApplicationCard'
 import Header from '../components/Header'
+import { ChevronLeft } from 'lucide-react'
 
 const VALID_STATUSES = ['Applied', 'Interview', 'Offer', 'Rejected', 'Saved']
 const PAGE_SIZE = 20
@@ -102,7 +103,13 @@ export default function StatusPage() {
                         </p>
                     </div>
                     <Link to="/dashboard" className="btn btn-ghost btn-sm">
-                        Back to Dashboard
+                        <button
+                            type="button"
+                            className="btn gap-2 btn-primary hover:border-white"
+                        >
+                            <ChevronLeft className="h-4 w-4" />
+                            Back to Dashboard
+                        </button>
                     </Link>
                 </div>
 
@@ -114,7 +121,7 @@ export default function StatusPage() {
                     <div className="mt-12 text-center text-base-content/70">Loading applications...</div>
                 ) : (
                     <>
-                        <div className="space-y-3">
+                        <div className="grid gap-4 sm:grid-cols-4 xl:grid-cols-5">
                             {items.map((application) => (
                                 <ApplicationCard key={application._id} application={application} />
                             ))}

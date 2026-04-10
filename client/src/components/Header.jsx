@@ -25,6 +25,7 @@ export default function Header() {
 
         <div className="flex items-center gap-4">
           {/* {title && <h1 className="text-xl font-semibold text-white">{title}</h1>} */}
+          {/* {title && <h1 className="text-xl font-semibold text-white">{title}</h1>} */}
           <button
             type="button"
             className="btn btn-ghost btn-sm gap-2 hover:border-white"

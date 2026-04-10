@@ -34,7 +34,7 @@ export default function ApplicationCard({ application }) {
       className="card w-full cursor-pointer border border-x-base-200 bg-base-100 shadow-sm transition hover:border-white"
     >
       <div className="card-body p-4">
-        <div className="flex items-start justify-between gap-4">
+        <div className="items-start gap-4">
           <div>
             <h3 className="text-base font-semibold text-base-content">
               {application.company}

@@ -65,7 +65,7 @@ export default function DashboardPage() {
           </div>
           <button
             type="button"
-            className="btn btn-primary gap-2"
+            className="btn btn-primary hover:border-white gap-2"
             onClick={() => setModalOpen(true)}
           >
             <Plus className="h-4 w-4" />
